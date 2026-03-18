@@ -64,7 +64,8 @@ function fmtVND(usd) {
   return Math.round(usd * 26000).toLocaleString('vi-VN') + '₫';
 }
 function getToday() {
-  return new Date().toISOString().split('T')[0];
+  const vnNow = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+  return vnNow.toISOString().split('T')[0];
 }
 function getTotals() {
   const accounts = DATA.accounts || [];
@@ -87,8 +88,10 @@ function getTotals() {
 async function checkNotifications() {
   const today = getToday();
   const todayMs = new Date(today).getTime();
-  const hour = new Date().getHours();
-  console.log(`[CHECK] ${today} ${hour}:00 — Running notification check...`);
+  // Dùng giờ Việt Nam (UTC+7)
+  const vnNow = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+  const hour = vnNow.getUTCHours();
+  console.log(`[CHECK] VN ${today} ${hour}h — Running notification check...`);
 
   // 1. PAYOUT ALERTS
   if (DATA.tgNotifyPayout) {
@@ -124,9 +127,9 @@ async function checkNotifications() {
   }
 
   // 3. DAILY SUMMARY lúc 20h
-  const minute = new Date().getMinutes();
-  // Daily summary lúc 20:20 (test) — đổi lại thành hour >= 20 sau khi test xong
-  if (DATA.tgNotifyDaily && hour === 20 && minute >= 20 && DATA.tgLastDaily !== today) {
+  const minute = vnNow.getUTCMinutes();
+  // Daily summary lúc 20:30 VN (test) — đổi lại thành hour >= 20 sau khi test xong
+  if (DATA.tgNotifyDaily && hour === 20 && minute >= 30 && DATA.tgLastDaily !== today) {
     const pe = DATA.profitEntries || {};
     const todayEntries = pe[today] || [];
     const todayTotal = todayEntries.reduce((s, e) => s + e.amount, 0);
@@ -218,6 +221,13 @@ app.post('/report', async (req, res) => {
     + `💳 Tổng số dư: <b>${fmt(totalBal)}</b> (~${fmtVND(totalBal)})`;
   const ok = await sendTelegram(msg);
   res.json({ ok });
+});
+
+// Reset daily để test lại
+app.post('/resetdaily', (req, res) => {
+  DATA.tgLastDaily = '';
+  console.log('[RESET] tgLastDaily reset');
+  res.json({ ok: true });
 });
 
 // Ping endpoint
