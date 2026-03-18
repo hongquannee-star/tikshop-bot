@@ -86,12 +86,13 @@ function getTotals() {
 
 // ========== NOTIFICATION LOGIC ==========
 async function checkNotifications() {
-  const today = getToday();
-  const todayMs = new Date(today).getTime();
-  // Dùng giờ Việt Nam (UTC+7)
+  // Giờ Việt Nam (UTC+7)
   const vnNow = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
   const hour = vnNow.getUTCHours();
-  console.log(`[CHECK] VN ${today} ${hour}h — Running notification check...`);
+  const minute = vnNow.getUTCMinutes();
+  const today = vnNow.toISOString().split('T')[0];
+  const todayMs = new Date(today).getTime();
+  console.log(`[CHECK] VN time: ${today} ${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')} — Running notification check...`);
 
   // 1. PAYOUT ALERTS
   if (DATA.tgNotifyPayout) {
@@ -128,8 +129,8 @@ async function checkNotifications() {
 
   // 3. DAILY SUMMARY lúc 20h
   const minute = vnNow.getUTCMinutes();
-  // Daily summary lúc 20:30 VN (test) — đổi lại thành hour >= 20 sau khi test xong
-  if (DATA.tgNotifyDaily && hour === 20 && minute >= 30 && DATA.tgLastDaily !== today) {
+  // Daily summary lúc 20:00 VN mỗi ngày
+  if (DATA.tgNotifyDaily && hour >= 20 && DATA.tgLastDaily !== today) {
     const pe = DATA.profitEntries || {};
     const todayEntries = pe[today] || [];
     const todayTotal = todayEntries.reduce((s, e) => s + e.amount, 0);
@@ -152,8 +153,8 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ========== CRON JOBS ==========
 // Kiểm tra mỗi giờ
-// Kiểm tra mỗi phút (test) — đổi lại '0 * * * *' sau khi test xong
-cron.schedule('* * * * *', () => {
+// Kiểm tra mỗi giờ
+cron.schedule('0 * * * *', () => {
   checkNotifications();
 });
 
