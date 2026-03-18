@@ -125,8 +125,8 @@ async function checkNotifications() {
 
   // 3. DAILY SUMMARY lúc 20h
   const minute = new Date().getMinutes();
-  // Daily summary lúc 20:12 (test) — đổi lại thành hour >= 20 sau khi test xong
-  if (DATA.tgNotifyDaily && hour === 20 && minute >= 12 && DATA.tgLastDaily !== today) {
+  // Daily summary lúc 20:20 (test) — đổi lại thành hour >= 20 sau khi test xong
+  if (DATA.tgNotifyDaily && hour === 20 && minute >= 20 && DATA.tgLastDaily !== today) {
     const pe = DATA.profitEntries || {};
     const todayEntries = pe[today] || [];
     const todayTotal = todayEntries.reduce((s, e) => s + e.amount, 0);
@@ -149,7 +149,8 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ========== CRON JOBS ==========
 // Kiểm tra mỗi giờ
-cron.schedule('0 * * * *', () => {
+// Kiểm tra mỗi phút (test) — đổi lại '0 * * * *' sau khi test xong
+cron.schedule('* * * * *', () => {
   checkNotifications();
 });
 
