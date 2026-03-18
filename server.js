@@ -128,7 +128,6 @@ async function checkNotifications() {
   }
 
   // 3. DAILY SUMMARY lúc 20h
-  const minute = vnNow.getUTCMinutes();
   // Daily summary lúc 20:00 VN mỗi ngày
   if (DATA.tgNotifyDaily && hour >= 20 && DATA.tgLastDaily !== today) {
     const pe = DATA.profitEntries || {};
