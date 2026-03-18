@@ -124,7 +124,9 @@ async function checkNotifications() {
   }
 
   // 3. DAILY SUMMARY lúc 20h
-  if (DATA.tgNotifyDaily && hour >= 20 && DATA.tgLastDaily !== today) {
+  const minute = new Date().getMinutes();
+  // Daily summary lúc 20:12 (test) — đổi lại thành hour >= 20 sau khi test xong
+  if (DATA.tgNotifyDaily && hour === 20 && minute >= 12 && DATA.tgLastDaily !== today) {
     const pe = DATA.profitEntries || {};
     const todayEntries = pe[today] || [];
     const todayTotal = todayEntries.reduce((s, e) => s + e.amount, 0);
