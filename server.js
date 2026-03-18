@@ -74,7 +74,7 @@ function getTotals() {
            + costs.reduce((s, c) => s + (c.usd || 0), 0);
   const tv = accounts.reduce((s, a) => {
     const v = (a.onHold || 0) - (a.orders || 0) * 5 + (a.netEarnings || 0);
-    return s + (a.status === 'DIE' ? v * 0.75 : v);
+    return s + v; // Full value, không nhân 0.75
   }, 0);
   const tp = Object.values(pe).flat().reduce((s, e) => s + (e.amount || 0), 0);
   const live = accounts.filter(a => a.status === 'LIVE').length;
